@@ -79,7 +79,7 @@ userSchema.methods.generateAuthToken = async function () {
   return token;
 };
 
-const User = mongoose.model("User", customerSchema);
+const Customer = mongoose.model("User", customerSchema);
 mongoose.set("useFindAndModify", false);
 
 module.exports = Customer;

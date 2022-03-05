@@ -22,7 +22,7 @@ const orderItemSchema = new mongoose.Schema({
   },
 });
 
-const orderSchema = new mongoose.Schema(
+const OrderSchema = new mongoose.Schema(
   {
     Customer: {
       type: mongoose.Schema.Types.ObjectId,
@@ -46,5 +46,5 @@ const orderSchema = new mongoose.Schema(
   }
 );
 
-const orderModel = mongoose.model("Order", orderSchema);
-export default orderModel;
+const Order = mongoose.model("Order", OrderSchema);
+export default Order;
