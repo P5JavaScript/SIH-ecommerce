@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const customerSchema = new mongoose.Schema(
@@ -46,7 +46,6 @@ const customerSchema = new mongoose.Schema(
       type: String,
       default: "https://i.ibb.co/R74JSvc/ec-default.png",
     },
-    UserName: { type: String, required: true },
     Verified: { type: Boolean, default: false },
     EmailVerifyToken: { type: String },
     // SecurityActions: [
@@ -72,14 +71,27 @@ const customerSchema = new mongoose.Schema(
   }
 );
 
-userSchema.methods.generateAuthToken = async function () {
-  const user = this;
-  const token = jwt.sign({ _id: user._id.toString() }, process.env.JWT_SECRET);
-  await user.save();
+customerSchema.methods.generateAuthToken = async function () {
+  const customer = this;
+  const token = jwt.sign({ _id: customer._id.toString() }, process.env.JWT_SECRET);
+  await customer.save();
   return token;
 };
 
-const Customer = mongoose.model("User", customerSchema);
-mongoose.set("useFindAndModify", false);
+customerSchema.statics.findByCredentials = async (Email, password) => {
+  const customer = await Customer.findOne({ Email });
 
+  if (!customer) {
+    throw new Error("Unable to find the customer");
+  }
+  const isMatch = await bcrypt.compare(password, customer.Password);
+
+  if (!isMatch) {
+    throw new Error("Incorrect Password");
+  }
+  return customer;
+};
+
+const Customer = mongoose.model("Customer", customerSchema);
+// mongoose.set("useFindAndModify", false);
 module.exports = Customer;
