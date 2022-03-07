@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-const SellerSchema = new mongoose.Schema(
+const sellerSchema = new mongoose.Schema(
   {
     Email: {
       type: String,
@@ -76,14 +76,28 @@ const SellerSchema = new mongoose.Schema(
   }
 );
 
-userSchema.methods.generateAuthToken = async function () {
-  const user = this;
-  const token = jwt.sign({ _id: user._id.toString() }, process.env.JWT_SECRET);
-  await user.save();
+sellerSchema.methods.generateAuthToken = async function () {
+  const seller = this;
+  const token = jwt.sign({ _id: seller._id.toString() }, process.env.JWT_SECRET);
+  await seller.save();
   return token;
 };
 
-const Seller = mongoose.model("User", SellerSchema);
-mongoose.set("useFindAndModify", false);
+sellerSchema.statics.findByCredentials = async (Email, password) => {
+  const seller = await Seller.findOne({ Email });
+
+  if (!seller) {
+    throw new Error("Unable to find the seller");
+  }
+  const isMatch = await bcrypt.compare(password, seller.Password);
+
+  if (!isMatch) {
+    throw new Error("Incorrect Password");
+  }
+  return seller;
+};
+
+const Seller = mongoose.model("Seller", sellerSchema);
+// mongoose.set("useFindAndModify", false);
 
 module.exports = Seller;
