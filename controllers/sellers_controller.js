@@ -75,6 +75,7 @@ module.exports.signIn = async function (req, res) {
       });
     }
   } catch (e) {
+    console.log(e)
     return res.send({ success: false, message: e.message });
   }
 };
